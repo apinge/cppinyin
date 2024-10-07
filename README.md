@@ -34,6 +34,7 @@ for (auto piece : pieces) {
 std::cout << oss.str() << std::endl;
 /*
 result:
-y ú q iān c ān j iā l e k uài j ì p éi x ùn b ān s uī r án t ā d e k uài j ì j ī ch ǔ c ēn c ī b ù q í ， d àn t ā r éng r án h uì n ǔ l ì x ué x í */
+yu2 qian1 can1 jia1 le5 kuai4 ji4 pei2 xun4 ban1 sui1 ran2 ta1 de5 kuai4 ji4 ji1 chu3 cen1 ci1 bu4 qi2 ， dan4 ta1 reng2 ran2 hui4 nu3 li4 xue2 xi2
+*/
 }
 ```
