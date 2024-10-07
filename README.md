@@ -1,45 +1,39 @@
-# 简介
+# Cppinyin
+This repository is forked from [cppinyin](https://github.com/pkufool/cppinyin) and aims to provide a pure C++ implementation for generating Pinyin from text. The original repository handled homographs in Chinese characters very well, and this repository further enhances compatibility with the C++ environment.
 
-cppinyin 是一个用 C++ 实现的中文转拼音工具，可作为[pypinyin](https://github.com/mozillazg/python-pinyin) 的替代方案，之所以使用 C++ 实现，一是方便部署，二也是为了提升效率，我相信 cppinyin 的转换速度要比 pypinyin 好不少。
-
-
-# 安装
-
-## python
+# Build 
 
 ```
-pip install cppinyin
+mkdir build && cd build
+cmake -S ..
+cmake --build . --config Release
 ```
 
-## C++
+# Usage
+```C++
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include "cppinyin/csrc/cppinyin.h"
 
-可从源码编译:
+int main(){
+system("chcp 65001"); //Using UTF-8 Encoding
+std::string vocab_path = "cppinyin/resources/pinyin.raw";
+cppinyin::PinyinEncoder processor(vocab_path);
 
+std::string str = "于谦参加了会计培训班 虽然他的会计基础参差不齐，但他仍然会努力学习";
+
+std::ostringstream oss;
+std::vector<std::string> pieces;
+
+processor.Encode(str, &pieces);
+for (auto piece : pieces) {
+    oss << piece << " ";
+}
+std::cout << oss.str() << std::endl;
+/*
+result:
+y ú q iān c ān j iā l e k uài j ì p éi x ùn b ān s uī r án t ā d e k uài j ì j ī ch ǔ c ēn c ī b ù q í ， d àn t ā r éng r án h uì n ǔ l ì x ué x í */
+}
 ```
-mkdir build
-cd build
-cmake ..
-make -j
-```
-
-集成可用 cmake
-
-
-# 使用
-
-## python
-
-```
-import cppinyin
-
-encoder = cppinyin.Encoder()
-
-encoder.encode("我是中国人民的儿子")
-```
-
-## 命令行
-
-```
-cppinyin encode 我是中国人民的儿子
-```
-
