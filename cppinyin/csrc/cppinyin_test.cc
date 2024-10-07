@@ -23,6 +23,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "cppinyin/csrc/cppinyin.h"
 
@@ -30,10 +31,11 @@ namespace cppinyin {
 
 TEST(PinyinEncoder, TestEncode) {
   system("chcp 65001"); //Using UTF-8 Encoding (CHCP 65001) 
-  std::string vocab_path = "C:\\Users\\tongqiu\\Documents\\OpenVINO\\TTS\\cppinyin-0.4\\cppinyin\\python\\cppinyin\\resources\\pinyin.raw";
-  PinyinEncoder processor(vocab_path);
+  std::filesystem::path vocab_path = "cpp_pinyin.raw";
 
-  std::string str = "于谦参加了会计培训班 虽然他的会计基础参差不齐，但他仍然会努力学习";
+  PinyinEncoder processor(vocab_path.string());
+
+  std::string str ="不要去 不能这样"; //"于谦参加了会计培训班 虽然他的会计基础参差不齐，但他仍然会努力学习";
 
   std::ostringstream oss;
   std::vector<std::string> pieces;
@@ -70,8 +72,7 @@ TEST(PinyinEncoder, TestEncode) {
 }
 
 TEST(PinyinEncoder, TestSaveLoad) {
-  std::string vocab_path =
-      "C:\\Users\\tongqiu\\Documents\\OpenVINO\\TTS\\cppinyin-0.4\\cppinyin\\python\\cppinyin\\resources\\pinyin.raw";
+  std::string vocab_path = "pinyin.raw";
   auto start = std::chrono::high_resolution_clock::now();
   PinyinEncoder processor(vocab_path);
   auto stop = std::chrono::high_resolution_clock::now();
@@ -92,8 +93,7 @@ TEST(PinyinEncoder, TestSaveLoad) {
   std::cerr << "Build from binary file : "
             << static_cast<int32_t>(duration.count()) << std::endl;
 
-  //std::string str = "我是中国 人我爱我的 love you 祖国";
-  std::string str = "参加了一个参差不齐的会议 碰到一个会计";
+  std::string str = "我是中国 人我爱我的 love you 祖国";
   std::vector<std::string> pieces;
   processor.Encode(str, &pieces);
 
