@@ -24,12 +24,21 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#ifdef _WIN32
+//#include <codecvt>
+//#include <fcntl.h>
+//#include <io.h>
+#include <windows.h>
+#endif
 
 #include "cppinyin/csrc/cppinyin.h"
 
 namespace cppinyin {
 
 TEST(PinyinEncoder, TestEncode) {
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+#endif
   std::string vocab_path = "cppinyin/python/cppinyin/resources/pinyin.raw";
   PinyinEncoder processor(vocab_path);
 
@@ -69,6 +78,9 @@ TEST(PinyinEncoder, TestEncode) {
 }
 
 TEST(PinyinEncoder, TestSaveLoad) {
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+#endif
   std::string vocab_path = "cppinyin/python/cppinyin/resources/pinyin.raw";
   auto start = std::chrono::high_resolution_clock::now();
   PinyinEncoder processor(vocab_path);

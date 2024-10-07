@@ -25,6 +25,13 @@ option(CPPINYIN_ENABLE_TESTS "Whether to build tests" ON)
 option(CPPINYIN_BUILD_PYTHON "Whether to build Python" OFF)
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 
+# for env witout setting utf-8 for Chinese 
+if(WIN32)
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/execution-charset:utf-8>")
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
+endif()
+
 if(WIN32)
   message(STATUS "Set BUILD_SHARED_LIBS to OFF for Windows")
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -39,23 +46,32 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-include(CheckCXXCompilerFlag)
-if(NOT WIN32)
-  check_cxx_compiler_flag("-std=c++14" CPPINYIN_COMPILER_SUPPORTS_CXX14)
-else()
-  # windows x86 or x86_64
-  check_cxx_compiler_flag("/std:c++14" CPPINYIN_COMPILER_SUPPORTS_CXX14)
-endif()
-if(NOT CPPINYIN_COMPILER_SUPPORTS_CXX14)
-  message(FATAL_ERROR "
-    cppinyin requires a compiler supporting at least C++14.
-    If you are using GCC, please upgrade it to at least version 7.0.
-    If you are using Clang, please upgrade it to at least version 3.4.")
-endif()
+set(CMAKE_CXX_STANDARD 20)  
 
-set(CMAKE_CXX_STANDARD 14 CACHE STRING "The C++ version to be used.")
-set(CMAKE_CXX_EXTENSIONS OFF)
+
+#include(CheckCXXCompilerFlag)
+#if(NOT WIN32)
+#  check_cxx_compiler_flag("-std=c++14" CPPINYIN_COMPILER_SUPPORTS_CXX14)
+#else()
+  # windows x86 or x86_64
+#  check_cxx_compiler_flag("/std:c++14" CPPINYIN_COMPILER_SUPPORTS_CXX14)
+#endif()
+#if(NOT CPPINYIN_COMPILER_SUPPORTS_CXX14)
+#  message(FATAL_ERROR "
+#    cppinyin requires a compiler supporting at least C++14.
+#    If you are using GCC, please upgrade it to at least version 7.0.
+#    If you are using Clang, please upgrade it to at least version 3.4.")
+#endif()
+
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "The C++ version to be used.")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)  
+set(CMAKE_CXX_EXTENSIONS OFF) # Disable compiler-specific extensions to ensure strict C++ standard compliance
 message(STATUS "C++ Standard version: ${CMAKE_CXX_STANDARD}")
+
+# Add /Zc:__cplusplus flag for Visual Studio to properly set the __cplusplus macro
+if (MSVC)
+  add_compile_options(/Zc:__cplusplus)
+endif()
 
 if(CPPINYIN_BUILD_PYTHON)
   include(pybind11)
