@@ -33,8 +33,8 @@
 
 namespace cppinyin {
 
-void PinyinEncoder::Build(std::istream &is) {
-  LoadVocab(is);
+void PinyinEncoder::Build(const std::string &vocab_path) {
+  LoadVocab(vocab_path);
 
   std::vector<const char *> keys(tokens_.size());
   std::vector<size_t> length(tokens_.size());
@@ -194,7 +194,7 @@ void PinyinEncoder::Encode(const std::vector<std::string> &strs,
   ostrs->resize(strs.size());
   std::vector<std::future<void>> results;
   for (int32_t i = 0; i < strs.size(); ++i) {
-    results.emplace_back(pool_->enqueue([this, i, &strs, ostrs] {
+    results.emplace_back(pool_->enqueue([this, i, &strs, ostrs]() {
       return this->Encode(strs[i], &((*ostrs)[i]));
     }));
   }
@@ -204,7 +204,12 @@ void PinyinEncoder::Encode(const std::vector<std::string> &strs,
   }
 }
 
-void PinyinEncoder::LoadVocab(std::istream &is) {
+void PinyinEncoder::LoadVocab(const std::string &vocab_path) {
+  std::ifstream is(vocab_path);
+  if (!is) {
+    std::cerr << "Open vocab file failed : " << vocab_path.c_str();
+    exit(-1);
+  }
   tokens_.clear();
   scores_.clear();
   values_.clear();
@@ -257,24 +262,6 @@ std::string PinyinEncoder::RemoveTone(const std::string &s) const {
   std::string phonetic;
   std::size_t len;
   std::size_t pos = s.find_first_of(phonetics_);
-
-  // Handle m̄ : 0x6d 0xcc 0x7c and m̀ : 0x6d 0xcc 0x80
-  // m is 0x6d
-  const uint8_t *p = reinterpret_cast<const uint8_t *>(s.c_str());
-  if (p[pos] == 0x6d) {
-    if ((p[pos + 1] == 0xcc && p[pos + 2] == 0x7c) ||
-        (p[pos + 1] == 0xcc && p[pos + 2] == 0x80)) {
-      // do nothing
-    } else {
-      pos = s.find_first_of(phonetics_, pos + 1);
-    }
-  }
-
-  // Handle ü : 0xc3 0xbc not a phonetic
-  if (p[pos] == 0xc3 && p[pos + 1] == 0xbc) {
-    pos = s.find_first_of(phonetics_, pos + 1);
-  }
-
   if (pos == std::string::npos) {
     return s;
   } else {
@@ -287,7 +274,6 @@ std::string PinyinEncoder::RemoveTone(const std::string &s) const {
       phonetic = s.substr(pos, len);
     }
   }
-
   std::string phone = phonetics_map_.at(phonetic);
 
   std::ostringstream oss;
@@ -319,7 +305,7 @@ size_t PinyinEncoder::SaveValues(const std::string &model_path) const {
   return offset;
 }
 
-size_t PinyinEncoder::LoadValues(std::istream &ifile) {
+size_t PinyinEncoder::LoadValues(std::ifstream &ifile) {
   size_t offset = 0;
   uint32_t size;
 
@@ -346,20 +332,18 @@ size_t PinyinEncoder::LoadValues(std::istream &ifile) {
 
 void PinyinEncoder::Load(const std::string &model_path) {
   std::ifstream ifile(model_path, std::ifstream::binary);
-  Load(ifile);
-}
 
-void PinyinEncoder::Load(std::istream &is) {
   std::string value;
-  ReadHeader(is, &value);
+  ReadHeader(ifile, &value);
 
   if (HEADER != value) {
-    is.seekg(0, std::ios::beg);
-    return Build(is);
+    ifile.close();
+    return Build(model_path);
   }
 
-  size_t offset = LoadValues(is) + value.size();
-  da_.open(is);
+  size_t offset = LoadValues(ifile) + value.size();
+  ifile.close();
+  da_.open(model_path.c_str(), "rb", offset);
 }
 
 void PinyinEncoder::Save(const std::string &model_path) const {

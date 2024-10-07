@@ -24,7 +24,6 @@
 #include "cppinyin/csrc/threadpool.h"
 #include "cppinyin/csrc/utils.h"
 #include <cstdlib>
-#include <fstream>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -42,14 +41,8 @@ public:
   PinyinEncoder(const std::string &vocab_path,
                 int32_t num_threads = std::thread::hardware_concurrency()) {
     pool_ = std::make_unique<ThreadPool>(num_threads);
-    auto is = std::fstream(vocab_path);
-    Load(is);
-  }
 
-  PinyinEncoder(std::istream &is,
-                int32_t num_threads = std::thread::hardware_concurrency()) {
-    pool_ = std::make_unique<ThreadPool>(num_threads);
-    Load(is);
+    Load(vocab_path);
   }
 
   PinyinEncoder(int32_t num_threads = std::thread::hardware_concurrency()) {
@@ -66,14 +59,13 @@ public:
               bool partial = false) const;
 
   void Load(const std::string &model_path);
-  void Load(std::istream &is);
 
   void Save(const std::string &model_path) const;
 
 private:
-  void Build(std::istream &is);
+  void Build(const std::string &vocab_path);
 
-  void LoadVocab(std::istream &is);
+  void LoadVocab(const std::string &vocab_path);
 
   void EncodeBase(const std::string &str, std::vector<DagItem> *route) const;
 
@@ -93,7 +85,7 @@ private:
   std::string RemoveTone(const std::string &s) const;
 
   size_t SaveValues(const std::string &model_path) const;
-  size_t LoadValues(std::istream &ifile);
+  size_t LoadValues(std::ifstream &ifile);
 
   // Note: zh ch sh not included
   // Treat y w as initials

@@ -26,11 +26,11 @@ option(CPPINYIN_BUILD_PYTHON "Whether to build Python" OFF)
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
 
 # for env witout setting utf-8 for Chinese 
-if(WIN32)
-  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/execution-charset:utf-8>")
-  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
-  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
-endif()
+#if(WIN32)
+#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/execution-charset:utf-8>")
+#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
+#endif()
 
 if(WIN32)
   message(STATUS "Set BUILD_SHARED_LIBS to OFF for Windows")

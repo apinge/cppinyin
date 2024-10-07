@@ -10,7 +10,7 @@ if (NOT BUILD_SHARED_LIBS)
 endif()
 
 if (NOT WIN32 AND (NOT DEFINED ANDROID_ABI))
-  target_link_libraries(cppinyin_core pthread)
+target_link_libraries(cppinyin_core pthread)
 endif()
 
 install(TARGETS cppinyin_core DESTINATION ${CMAKE_INSTALL_PREFIX})
