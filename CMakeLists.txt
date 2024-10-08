@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(cppinyin)
 
@@ -71,6 +71,8 @@ message(STATUS "C++ Standard version: ${CMAKE_CXX_STANDARD}")
 # Add /Zc:__cplusplus flag for Visual Studio to properly set the __cplusplus macro
 if (MSVC)
   add_compile_options(/Zc:__cplusplus)
+  set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Choose the configuration types" FORCE)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")# refer to https://developercommunity.visualstudio.com/t/debug-build-works-but-release-build-failsas-well-a/428160
 endif()
 
 if(CPPINYIN_BUILD_PYTHON)
