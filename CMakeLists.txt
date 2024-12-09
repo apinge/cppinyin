@@ -72,7 +72,7 @@ message(STATUS "C++ Standard version: ${CMAKE_CXX_STANDARD}")
 if (MSVC)
   add_compile_options(/Zc:__cplusplus)
   set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Choose the configuration types" FORCE)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")# refer to https://developercommunity.visualstudio.com/t/debug-build-works-but-release-build-failsas-well-a/428160
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")# refer to https://developercommunity.visualstudio.com/t/debug-build-works-but-release-build-failsas-well-a/428160
 endif()
 
 if(CPPINYIN_BUILD_PYTHON)
